@@ -33,3 +33,11 @@
   observation. This verifies reachability, not independent identity enrollment.
 - Final independent reviewer found no remaining important issues. Known private
   environment identifiers absent from all Git commits checked.
+- Follow-up physical validation used actual MCP stdio calls for reservation
+  pagination and traffic. Both tools returned valid pseudonymized output; no
+  configuration or data mutations were attempted. Cross-tool comparison remained
+  inconclusive because subsequent client/traffic reads intermittently failed.
+  Safe diagnostics isolated a 45-second client-list timeout after successful
+  login; recent PCIe/Wi-Fi host failures and an SSH timeout were also observed.
+  Documented as a connectivity/reliability investigation, not a passing
+  sustained-operation test. Detailed live observations remain outside Git.

@@ -31,9 +31,27 @@ the default is now 45 and configurable within 1–60 seconds. Actual identifying
 output remains outside the repository. This is a single deployment observation,
 not certification across hardware revisions or firmware variants.
 
-Reservations, persistent operation and Wi-Fi fault recovery remain unverified.
-Traffic fields were present in the client-list response, but their units and
-accuracy have not been independently validated.
+Physical DHCP reservation reads and traffic reads were subsequently exercised
+through the actual stdio MCP process. Reservation counts, page limits,
+next-offset handling and non-overlapping pages passed. Traffic output contained
+online clients with finite non-negative rates, non-zero activity and descending
+combined-rate ordering. Both tools returned pseudonymized data without raw
+names, IP addresses or MAC addresses.
+
+Repeated cross-tool validation was not fully successful: a later client read
+failed, a follow-up client read succeeded, and follow-up traffic reads failed.
+Safe stage diagnostics showed successful authentication followed by a 45-second
+timeout waiting for the client-list response. The host also reported recent
+PCIe/Wi-Fi hardware-link failures, and a subsequent SSH connection timed out.
+Host connectivity is a plausible contributor, not a conclusively isolated cause.
+The results do not establish sustained reliability or a complete cross-snapshot
+alias-correlation pass. No retry loop or host/router configuration change was
+used to conceal these failures.
+
+Traffic units and accuracy have not been independently validated. Persistent
+operation, Wi-Fi fault recovery and repeatable cross-tool consistency remain
+pending. Repeat these checks on a stable host/network before treating the alpha
+as a reliable unattended monitoring service.
 
 Certificate observation is not proof of identity. The deployment operator must
 independently verify the certificate and enroll credentials locally before
