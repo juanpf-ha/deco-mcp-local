@@ -19,7 +19,7 @@ from deco_mcp_local.router import guard_request
 
 
 class TLSPeer:
-    def __init__(self, response=b'{"result":{}}', status='200 OK', require_close=False):
+    def __init__(self, response=b'{"result":{}}', status='200 OK', require_close=False, cookie_before_close=None):
         self.tmp = tempfile.TemporaryDirectory()
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, 'synthetic-router')])
@@ -43,6 +43,7 @@ class TLSPeer:
         self.received = b''
         self.response, self.status = response, status
         self.require_close = require_close
+        self.cookie_before_close = cookie_before_close
         self.thread = threading.Thread(target=self.run, daemon=True)
         self.thread.start()
 
@@ -73,6 +74,12 @@ class TLSPeer:
                         self.received += chunk
                     if self.require_close and b'\r\nconnection: close\r\n' not in b'\r\n' + head.lower() + b'\r\n':
                         return
+                    if self.cookie_before_close:
+                        # Model the conservative header ordering used by the
+                        # reference urllib transport for this session cookie.
+                        before_close=head.lower().split(b'\r\nconnection: close',1)[0]+b'\r\n'
+                        if b'\r\ncookie: '+self.cookie_before_close.encode()+b'\r\n' not in before_close:
+                            return
                     headers = ('HTTP/1.1 ' + self.status + '\r\nContent-Type: application/json\r\n'
                                + 'Location: https://external.invalid/\r\nContent-Length: '
                                + str(len(self.response)) + '\r\nConnection: close\r\n\r\n').encode()
@@ -159,6 +166,20 @@ class TransportTests(unittest.TestCase):
         peer = self.peer(status='302 Found')
         with self.assertRaises(TransportError):
             self.transport(peer).post_json('https://10.23.4.1/cgi-bin/luci/;stok=/login?form=auth', {})
+
+    def test_authenticated_read_preserves_cookie_before_terminal_close_header(self):
+        cookie='sysauth='+'a'*32
+        peer=self.peer(require_close=True,cookie_before_close=cookie,
+                       response=b'{"result":{"client_list":[]}}')
+        transport=self.transport(peer)
+        transport.cookie=cookie
+        try:
+            result=transport.post_form(
+                'https://10.23.4.1/cgi-bin/luci/;stok=aabbccdd/admin/client?form=client_list',
+                'sign=synthetic&data=synthetic')
+        except TransportError:
+            self.fail('Session cookie was not accepted before the terminal close header')
+        self.assertEqual(result,{'result':{'client_list':[]}})
 
     def test_arbitrary_destinations_and_paths_fail_without_socket(self):
         t = PinnedTransport('10.23.4.1', 'f' * 64)

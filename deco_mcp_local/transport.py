@@ -85,9 +85,12 @@ class PinnedTransport:
             # Each SDK operation uses a fresh connection. Match urllib's
             # explicit one-shot semantics: some Deco firmware resets or stalls
             # client-list replies when the request implies keep-alive.
-            headers = {'Content-Type': 'application/json', 'Connection': 'close'}
+            headers = {'Content-Type': 'application/json'}
             if self.cookie:
                 headers['Cookie'] = self.cookie
+            # Keep the session cookie before the final connection header, as
+            # urllib does, to reproduce the tested reference request exactly.
+            headers['Connection'] = 'close'
             conn.request('POST', path, body=data, headers=headers)
             resp = conn.getresponse()
             if resp.status != 200:
