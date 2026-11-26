@@ -5,7 +5,7 @@ and Compose, Python 3.14 inside the image.
 
 ## Automated checks
 
-- 26 tests passed in the test image with no external network, read-only root,
+- 27 tests passed in the latest test image with no external network, read-only root,
   test-only `/tmp` RAM mount, unprivileged UID, capabilities dropped and 128 MB
   memory limit. No tests skipped on the target Python 3.14 runtime.
 - Includes the pinned SDK's RSA/AES login and read calls against synthetic
