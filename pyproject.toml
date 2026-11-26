@@ -1,0 +1,18 @@
+[project]
+name = "deco-mcp-local"
+version = "0.1.0"
+description = "Read-only TP-Link Deco MCP over stdio with pinned TLS and pseudonymized output"
+requires-python = ">=3.14"
+license = "MIT"
+readme = "README.md"
+dependencies = ["tplink-deco-api==2.1.1"]
+
+[project.scripts]
+deco-mcp-local = "deco_mcp_local.server:main"
+
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["deco_mcp_local"]

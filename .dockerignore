@@ -1,0 +1,7 @@
+*
+!deco_mcp_local/
+!deco_mcp_local/*.py
+!tests/
+!tests/*.py
+!requirements.lock
+!Dockerfile
