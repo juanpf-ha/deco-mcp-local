@@ -12,6 +12,10 @@ TOOLS = [
 ]
 
 
+class ArgumentError(ValueError):
+    """Invalid client input, distinct from SDK parsing/transport errors."""
+
+
 class QueryService:
     def __init__(self, router, privacy):
         self.router, self.privacy = router, privacy
@@ -19,15 +23,15 @@ class QueryService:
     def call(self, name, args):
         specs = {n: props for n, _, props in TOOLS}
         if not isinstance(name, str) or name not in specs or not isinstance(args, dict):
-            raise ValueError('Unknown tool or invalid arguments')
+            raise ArgumentError('Unknown tool or invalid arguments')
         if any(k not in specs[name] for k in args):
-            raise ValueError('Unsupported argument')
+            raise ArgumentError('Unsupported argument')
         for key in ('limit', 'offset'):
             if key in args and (type(args[key]) is not int or args[key] < (1 if key == 'limit' else 0)
                                 or args[key] > (100 if key == 'limit' else 100000)):
-                raise ValueError('Invalid pagination')
+                raise ArgumentError('Invalid pagination')
         if 'online_only' in args and type(args['online_only']) is not bool:
-            raise ValueError('online_only must be boolean')
+            raise ArgumentError('online_only must be boolean')
         return self.router.call(lambda deco: self._query(deco, name, args))
 
     def _identity(self, obj):

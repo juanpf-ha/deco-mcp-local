@@ -190,6 +190,16 @@ class ProtocolTests(unittest.TestCase):
         self.assertTrue(r['result']['isError'])
         self.assertNotIn('secret-method', json.dumps(self.request('secret-method')))
 
+    def test_upstream_value_error_is_a_router_failure_not_bad_user_arguments(self):
+        class BrokenRouter(FakeRouter):
+            def get_device_list(self):
+                raise ValueError('private decrypted router field')
+        app = App(QueryService(BrokenRouter(), Privacy(b'a' * 32)))
+        response = app.handle(dict(jsonrpc='2.0', id=1, method='tools/call', params={'name': 'deco_status'}))
+        self.assertIn('result', response)
+        self.assertTrue(response['result']['isError'])
+        self.assertNotIn('private decrypted', json.dumps(response))
+
     def test_bad_messages_and_notifications(self):
         self.assertEqual(self.app.handle([])['error']['code'], -32600)
         self.assertEqual(self.app.handle({'jsonrpc': '2.0', 'id': True, 'method': 'ping'})['error']['code'], -32600)

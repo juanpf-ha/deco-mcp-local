@@ -2,7 +2,7 @@
 import json
 import sys
 from . import __version__
-from .tools import TOOLS
+from .tools import TOOLS, ArgumentError
 
 MAX_LINE = 64 * 1024
 PROTOCOLS = ('2025-11-25', '2025-06-18', '2025-03-26')
@@ -50,7 +50,7 @@ class App:
         if method == 'tools/call':
             try:
                 value = self.queries.call(params.get('name'), params.get('arguments', {}))
-            except ValueError:
+            except ArgumentError:
                 return error(mid, -32602, 'Unknown tool or invalid arguments')
             except Exception:
                 # Never serialize upstream exception text, request URLs or secret values.
