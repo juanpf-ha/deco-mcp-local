@@ -1,0 +1,7 @@
+# Merge into the Codex MCP configuration; replace every placeholder locally.
+# Never place the router password, alias key or .env contents here.
+[mcp_servers.deco_local]
+command = "ssh"
+args = ["-T", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes", "-i", "/PATH/TO/SSH_KEY", "USER@HOST", "/PATH/TO/deco-mcp-local/scripts/run-mcp.sh"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60
