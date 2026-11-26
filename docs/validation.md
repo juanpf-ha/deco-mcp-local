@@ -48,6 +48,14 @@ The results do not establish sustained reliability or a complete cross-snapshot
 alias-correlation pass. No retry loop or host/router configuration change was
 used to conceal these failures.
 
+A follow-up correlation attempt again failed on the client tool. During its
+defined observation window, SSH remained usable and the kernel recorded no new
+PCIe Link Down, missing-card or Wi-Fi transaction-failure events. Thus the
+earlier hardware events do not by themselves explain every failed read. A
+diagnostic read omitting the SDK's device selector also failed after successful
+authentication; it was not adopted as a production change. Client-list API and
+transport behavior still require isolation before claiming repeatable success.
+
 Traffic units and accuracy have not been independently validated. Persistent
 operation, Wi-Fi fault recovery and repeatable cross-tool consistency remain
 pending. Repeat these checks on a stable host/network before treating the alpha

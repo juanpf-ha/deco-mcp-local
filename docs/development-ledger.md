@@ -41,3 +41,9 @@
   login; recent PCIe/Wi-Fi host failures and an SSH timeout were also observed.
   Documented as a connectivity/reliability investigation, not a passing
   sustained-operation test. Detailed live observations remain outside Git.
+- Repeated the pending client/traffic correlation after the operator reported
+  stable connectivity. The client tool still failed while SSH was usable and no
+  new Wi-Fi hardware events were observed in the bounded test window. A
+  read-only request-shape probe without the SDK device selector also failed
+  after successful login. No production workaround was applied; API/transport
+  diagnosis remains open rather than attributing all failures to host Wi-Fi.
