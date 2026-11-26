@@ -83,8 +83,8 @@ class PinnedTransport:
             # also overridden so any automatic reconnection rechecks the pin.
             conn.connect()
             # Each SDK operation uses a fresh connection. Match urllib's
-            # explicit one-shot semantics: some Deco firmware resets or stalls
-            # client-list replies when the request implies keep-alive.
+            # explicit one-shot request framing for firmware interoperability;
+            # the bounded live observations are recorded in docs/validation.md.
             headers = {'Content-Type': 'application/json'}
             if self.cookie:
                 headers['Cookie'] = self.cookie

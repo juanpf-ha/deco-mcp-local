@@ -53,3 +53,14 @@
   explicit close succeeded twice. An earlier explicit-close client/traffic pair
   also shared consistent aliases. Added a real TLS-peer regression (observed
   failing assertion before implementation) and the minimal header change.
+- The first installed close-header change still failed the stdio client read.
+  Compared the exact reference request: it appends Connection after Cookie,
+  whereas the first patch placed it before Cookie. The exact reference variant
+  passed clients and traffic again. Preserved that header order with a second
+  failing-then-passing TLS-peer regression. Do not claim generic HTTP order
+  requirements or a proven firmware-internal cause.
+- Final Docker Python 3.14 run: all 29 tests passed. The actual installed stdio
+  MCP then completed client and traffic reads, preserving address aliases for
+  every overlapping device and returning no raw names/IP/MAC. Original image
+  retained for rollback. Long-term reliability and traffic measurement units
+  remain unverified; no router configuration was changed.

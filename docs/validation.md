@@ -5,7 +5,7 @@ and Compose, Python 3.14 inside the image.
 
 ## Automated checks
 
-- 27 tests passed in the latest test image with no external network, read-only root,
+- 29 tests passed in the development test image with no external network, read-only root,
   test-only `/tmp` RAM mount, unprivileged UID, capabilities dropped and 128 MB
   memory limit. No tests skipped on the target Python 3.14 runtime.
 - Includes the pinned SDK's RSA/AES login and read calls against synthetic
@@ -66,17 +66,28 @@ failed with connection resets; both explicit `Connection: close` attempts
 succeeded. An earlier explicit-close client/traffic pair also completed with
 matching address aliases for all overlapping devices.
 
-The transport now explicitly declares its existing one-connection-per-operation
-behavior, matching urllib's original transport. A generated TLS-peer regression
-failed before the change and passed after it. This evidence supports a firmware
-connection-handling compatibility fix; it does not prove long-term stability or
-exclude unrelated host Wi-Fi faults. Final installed-MCP repetition is recorded
-separately after deployment validation.
+The first installed change added the close header before the session cookie and
+still failed the actual stdio check. The reference diagnostic appended it after
+the cookie; repeating that exact request shape succeeded. The implementation
+therefore preserves urllib's header order, with the session cookie preceding
+the final explicit close header. This is an empirical interoperability
+hypothesis, not a claim that HTTP generally requires that order or that the
+firmware's internal failure mechanism has been established.
+
+Two generated TLS-peer regressions preserve the chosen request shape. Each was
+observed failing before its corresponding change and passing afterward; these
+synthetic peers do not establish physical firmware causality.
+
+After deployment, the actual unmodified stdio MCP client and traffic tools both
+completed. All overlapping device aliases retained the same address aliases;
+both outputs omitted names and raw IP/MAC addresses. The original deployment
+image was retained for rollback. This closes the bounded cross-snapshot check,
+but does not demonstrate prolonged stability or exclude unrelated host faults.
 
 Traffic units and accuracy have not been independently validated. Persistent
-operation, Wi-Fi fault recovery and repeatable cross-tool consistency remain
-pending. Repeat these checks on a stable host/network before treating the alpha
-as a reliable unattended monitoring service.
+operation, Wi-Fi fault recovery and sustained repeatability remain pending.
+The successful bounded check should not be treated as certification for an
+unattended monitoring service.
 
 Certificate observation is not proof of identity. The deployment operator must
 independently verify the certificate and enroll credentials locally before
