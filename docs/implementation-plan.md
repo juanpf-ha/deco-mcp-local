@@ -17,12 +17,12 @@ Stack: Python 3.14 runtime, stdlib unittest, pinned tplink-deco-api 2.1.1.
 
 ## Tasks
 
-- [ ] Tests first: Config.from_env, Privacy.device/address, QueryService.call,
+- [x] Tests first: Config.from_env, Privacy.device/address, QueryService.call,
   App.handle/serve, PinnedTransport and GuardedClient, using fictitious devices.
   Run unittest discovery and observe failure before implementation.
-- [ ] Implement config.py, privacy.py, transport.py, router.py, tools.py,
+- [x] Implement config.py, privacy.py, transport.py, router.py, tools.py,
   server.py and __main__.py. Run the complete test suite and fix failures.
-- [ ] Add Dockerfile, compose.yaml, hashed requirements.lock, SSH examples,
+- [x] Add Dockerfile, compose.yaml, hashed requirements.lock, SSH examples,
   SECURITY, CONTRIBUTING, MIT attribution, English/Spanish usage docs and CI.
 - [ ] Build/test isolated container on target; capture only generic outcomes in
   repo. Scan tracked files/history for private values. Independent code review.
