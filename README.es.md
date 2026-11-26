@@ -1,5 +1,7 @@
 # deco-mcp-local
 
+**Estado: versión alfa experimental.** [Notas de versión](CHANGELOG.md).
+
 MCP de **solo lectura** para TP-Link Deco, ejecutado en tu servidor Linux con
 Docker y accesible por SSH/stdio. No abre un puerto MCP ni usa la nube de TP-Link.
 

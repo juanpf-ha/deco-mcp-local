@@ -1,5 +1,9 @@
 # deco-mcp-local
 
+[![Synthetic security tests](https://github.com/juanpf-ha/deco-mcp-local/actions/workflows/tests.yml/badge.svg)](https://github.com/juanpf-ha/deco-mcp-local/actions/workflows/tests.yml)
+
+**Release status: experimental alpha.** See [release notes](CHANGELOG.md).
+
 **Read-only TP-Link Deco MCP over SSH/stdio, with certificate pinning and
 pseudonymized device identifiers.** Run it on your own Linux/Docker machine,
 including an x86 thin client. No open MCP port or TP-Link cloud login.
@@ -49,6 +53,8 @@ Download this repository and open its directory. Review source and SECURITY.md
 before providing credentials. Do not run a downloaded installer as root.
 
 ```sh
+git clone https://github.com/juanpf-ha/deco-mcp-local.git
+cd deco-mcp-local
 docker build --target runtime -t deco-mcp-local:0.1.0 .
 docker build --target test -t deco-mcp-local-test:0.1.0 .
 docker run --rm --network none --read-only --cap-drop ALL \

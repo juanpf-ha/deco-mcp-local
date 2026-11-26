@@ -22,7 +22,7 @@ and Compose, Python 3.14 inside the image.
 - Known private-environment identifier scan found no matches in checked Git
   history. No real configuration, passwords, keys or router output is tracked.
 
-## Not yet validated
+## Physical-device observations and remaining limits
 
 Physical authentication, mesh status and client-list reads have subsequently
 succeeded on an X20 1.4.0 gateway with M5 1.9.5 satellites. The client-list read
