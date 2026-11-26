@@ -47,7 +47,7 @@ class Config:
     password: str = field(repr=False)
     alias_key: bytes = field(repr=False)
     reveal_identifiers: bool = False
-    timeout: float = 10.0
+    timeout: float = 45.0
 
     @classmethod
     def from_env(cls):
@@ -58,8 +58,14 @@ class Config:
         reveal = os.environ.get('DECO_REVEAL_IDENTIFIERS', '0')
         if reveal not in ('0', '1'):
             raise ConfigError('DECO_REVEAL_IDENTIFIERS must be 0 or 1')
+        try:
+            timeout = int(os.environ.get('DECO_TIMEOUT_SECONDS', '45'))
+            if not 1 <= timeout <= 60:
+                raise ValueError
+        except ValueError:
+            raise ConfigError('DECO_TIMEOUT_SECONDS must be an integer from 1 to 60') from None
         password = read_secret('DECO_PASSWORD_FILE')
         key = read_secret('DECO_ALIAS_KEY_FILE')
         if not re.fullmatch('[a-fA-F0-9]{64}', key):
             raise ConfigError('DECO_ALIAS_KEY_FILE must contain 32 random bytes encoded as 64 hex characters')
-        return cls(host, pin, password, bytes.fromhex(key), reveal == '1')
+        return cls(host, pin, password, bytes.fromhex(key), reveal == '1', timeout)

@@ -104,6 +104,16 @@ class ConfigTests(unittest.TestCase):
             else:
                 self.fail('Missing file accepted')
 
+    def test_router_timeout_is_bounded_and_configurable(self):
+        for invalid in ['0', '-1', '61', 'nan', 'inf', 'secret-not-a-number']:
+            with self.subTest(invalid=invalid), patch.dict(os.environ, self.env | {'DECO_TIMEOUT_SECONDS': invalid}, clear=True):
+                with self.assertRaises(ConfigError):
+                    Config.from_env()
+        with patch.dict(os.environ, self.env | {'DECO_TIMEOUT_SECONDS': '30'}, clear=True):
+            self.assertEqual(Config.from_env().timeout, 30)
+        with patch.dict(os.environ, self.env, clear=True):
+            self.assertEqual(Config.from_env().timeout, 45)
+
 
 class PrivacyTests(unittest.TestCase):
     def test_stable_cross_tool_aliases_and_separate_keys(self):

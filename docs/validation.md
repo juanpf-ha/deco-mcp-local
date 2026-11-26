@@ -24,9 +24,16 @@ and Compose, Python 3.14 inside the image.
 
 ## Not yet validated
 
-Physical-device authentication, actual node/client/reservation/traffic payloads,
-mixed-model mesh compatibility, persistent operation and Wi-Fi fault recovery.
-No claim that any physical Deco model/firmware is certified by this release.
+Physical authentication, mesh status and client-list reads have subsequently
+succeeded on an X20 1.4.0 gateway with M5 1.9.5 satellites. The client-list read
+exceeded the original 10-second operation timeout and succeeded with 45 seconds;
+the default is now 45 and configurable within 1–60 seconds. Actual identifying
+output remains outside the repository. This is a single deployment observation,
+not certification across hardware revisions or firmware variants.
+
+Reservations, persistent operation and Wi-Fi fault recovery remain unverified.
+Traffic fields were present in the client-list response, but their units and
+accuracy have not been independently validated.
 
 Certificate observation is not proof of identity. The deployment operator must
 independently verify the certificate and enroll credentials locally before

@@ -3,8 +3,9 @@
 MCP de **solo lectura** para TP-Link Deco, ejecutado en tu servidor Linux con
 Docker y accesible por SSH/stdio. No abre un puerto MCP ni usa la nube de TP-Link.
 
-Es experimental: ninguna compatibilidad con modelos físicos se da por confirmada
-sin una prueba real. La API del Deco no está documentada oficialmente.
+Es experimental: se probaron login, estado y lista de clientes en una malla
+X20 1.4.0/M5 1.9.5. Eso no certifica otras revisiones o firmwares. La API del Deco
+no está documentada oficialmente. Ver [validación](docs/validation.md).
 
 ## Privacidad
 

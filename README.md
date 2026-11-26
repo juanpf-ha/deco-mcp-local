@@ -8,8 +8,9 @@ including an x86 thin client. No open MCP port or TP-Link cloud login.
 [Contributing](CONTRIBUTING.md) · [Upstream attribution](NOTICE.md)
 
 Experimental: not affiliated with TP-Link. The local router API is undocumented.
-No physical router model is certified by this release. A passing simulator test
-is not a claim of X20/M5 or other firmware compatibility.
+One mixed X20 1.4.0/M5 1.9.5 deployment has passed login, mesh status and client
+listing. This is not certification across hardware revisions or firmware
+variants. See [validation](docs/validation.md) for exactly what was tested.
 
 ## What it does
 
@@ -147,6 +148,10 @@ router. We do not alter a shared host's firewall or home automation services.
   be shared with your Deco app account; do not reuse it elsewhere.
 - **Timeout/disconnect:** check host Wi-Fi, SSH and router reachability. No
   automatic login retry avoids repeated login attempts or possible lockouts.
+  Large client lists can exceed ten seconds. `DECO_TIMEOUT_SECONDS` defaults to
+  45 per network operation and accepts integers 1–60. The example client tool
+  deadline is 240 seconds to accommodate login and one query; this is an upper
+  bound, not a polling interval.
 - **Unknown node/state:** firmware/API mismatch; report only sanitized symptoms.
 - **Multiple admin sessions:** do not run clients in parallel or poll rapidly.
   SDK logout invalidates local token state; it does not revoke the router session.

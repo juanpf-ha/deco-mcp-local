@@ -23,6 +23,7 @@ services:
       DECO_PASSWORD_FILE: /run/secrets/deco_password
       DECO_ALIAS_KEY_FILE: /run/secrets/alias_key
       DECO_REVEAL_IDENTIFIERS: "${DECO_REVEAL_IDENTIFIERS:-0}"
+      DECO_TIMEOUT_SECONDS: "${DECO_TIMEOUT_SECONDS:-45}"
     secrets:
       - deco_password
       - alias_key
