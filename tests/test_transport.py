@@ -19,7 +19,7 @@ from deco_mcp_local.router import guard_request
 
 
 class TLSPeer:
-    def __init__(self, response=b'{"result":{}}', status='200 OK'):
+    def __init__(self, response=b'{"result":{}}', status='200 OK', require_close=False):
         self.tmp = tempfile.TemporaryDirectory()
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, 'synthetic-router')])
@@ -42,6 +42,7 @@ class TLSPeer:
         self.port = self.sock.getsockname()[1]
         self.received = b''
         self.response, self.status = response, status
+        self.require_close = require_close
         self.thread = threading.Thread(target=self.run, daemon=True)
         self.thread.start()
 
@@ -70,6 +71,8 @@ class TLSPeer:
                             return
                         body += chunk
                         self.received += chunk
+                    if self.require_close and b'\r\nconnection: close\r\n' not in b'\r\n' + head.lower() + b'\r\n':
+                        return
                     headers = ('HTTP/1.1 ' + self.status + '\r\nContent-Type: application/json\r\n'
                                + 'Location: https://external.invalid/\r\nContent-Length: '
                                + str(len(self.response)) + '\r\nConnection: close\r\n\r\n').encode()
@@ -140,6 +143,17 @@ class TransportTests(unittest.TestCase):
             result = t.post_json('https://10.23.4.1/cgi-bin/luci/;stok=/login?form=auth', {'operation': 'read'})
         self.assertEqual(result, {'result': {}})
         self.assertIn(b'POST /cgi-bin/', peer.received)
+
+    def test_router_requiring_explicit_connection_close_returns_json(self):
+        # Model firmware which drops the request instead of replying when its
+        # one-shot HTTPS connection is not explicitly declared as such.
+        peer = self.peer(require_close=True)
+        try:
+            result = self.transport(peer).post_json(
+                'https://10.23.4.1/cgi-bin/luci/;stok=/login?form=auth', {'operation': 'read'})
+        except TransportError:
+            self.fail('The one-shot router peer dropped the request without an explicit close header')
+        self.assertEqual(result, {'result': {}})
 
     def test_redirect_is_rejected(self):
         peer = self.peer(status='302 Found')

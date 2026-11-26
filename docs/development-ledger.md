@@ -47,3 +47,9 @@
   read-only request-shape probe without the SDK device selector also failed
   after successful login. No production workaround was applied; API/transport
   diagnosis remains open rather than attributing all failures to host Wi-Fi.
+- Inspected only public firmware assets over pinned HTTPS: the client-list
+  endpoint and default device selector match the SDK. An alternating four-read
+  experiment changed only Connection: close; baseline failed twice with resets,
+  explicit close succeeded twice. An earlier explicit-close client/traffic pair
+  also shared consistent aliases. Added a real TLS-peer regression (observed
+  failing assertion before implementation) and the minimal header change.

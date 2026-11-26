@@ -56,6 +56,23 @@ diagnostic read omitting the SDK's device selector also failed after successful
 authentication; it was not adopted as a production change. Client-list API and
 transport behavior still require isolation before claiming repeatable success.
 
+## Explicit connection-close investigation
+
+The router's own public client-list model confirmed the SDK's endpoint and
+`device_mac: "default"` selector. A controlled alternating A/B experiment then
+changed only the HTTPS request's `Connection` header, keeping credentials,
+request body, TLS pin and read guards unchanged. Both original-header attempts
+failed with connection resets; both explicit `Connection: close` attempts
+succeeded. An earlier explicit-close client/traffic pair also completed with
+matching address aliases for all overlapping devices.
+
+The transport now explicitly declares its existing one-connection-per-operation
+behavior, matching urllib's original transport. A generated TLS-peer regression
+failed before the change and passed after it. This evidence supports a firmware
+connection-handling compatibility fix; it does not prove long-term stability or
+exclude unrelated host Wi-Fi faults. Final installed-MCP repetition is recorded
+separately after deployment validation.
+
 Traffic units and accuracy have not been independently validated. Persistent
 operation, Wi-Fi fault recovery and repeatable cross-tool consistency remain
 pending. Repeat these checks on a stable host/network before treating the alpha

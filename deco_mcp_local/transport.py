@@ -82,7 +82,10 @@ class PinnedTransport:
             # Verify before request() may transmit headers/body. connect() is
             # also overridden so any automatic reconnection rechecks the pin.
             conn.connect()
-            headers = {'Content-Type': 'application/json'}
+            # Each SDK operation uses a fresh connection. Match urllib's
+            # explicit one-shot semantics: some Deco firmware resets or stalls
+            # client-list replies when the request implies keep-alive.
+            headers = {'Content-Type': 'application/json', 'Connection': 'close'}
             if self.cookie:
                 headers['Cookie'] = self.cookie
             conn.request('POST', path, body=data, headers=headers)
