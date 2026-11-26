@@ -12,4 +12,4 @@ jobs:
       - name: Build locked test image (no router secrets)
         run: docker build --target test -t deco-mcp-local-test .
       - name: Exercise protocol and TLS offline
-        run: docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges deco-mcp-local-test
+        run: docker run --rm --network none --read-only --tmpfs /tmp:rw,noexec,nosuid,size=32m,mode=1777 --cap-drop ALL --security-opt no-new-privileges deco-mcp-local-test

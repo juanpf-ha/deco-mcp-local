@@ -24,8 +24,11 @@ Stack: Python 3.14 runtime, stdlib unittest, pinned tplink-deco-api 2.1.1.
   server.py and __main__.py. Run the complete test suite and fix failures.
 - [x] Add Dockerfile, compose.yaml, hashed requirements.lock, SSH examples,
   SECURITY, CONTRIBUTING, MIT attribution, English/Spanish usage docs and CI.
-- [ ] Build/test isolated container on target; capture only generic outcomes in
+- [x] Build/test isolated container on target; capture only generic outcomes in
   repo. Scan tracked files/history for private values. Independent code review.
-- [ ] Deliver local Git branch and reproducible source archive. Real router
+- [x] Deliver local Git branch and reproducible source archive. Real router
   enrollment and GitHub publication only with the missing local credentials and
   selected GitHub destination respectively.
+
+Pending integration: local credential enrollment, independent certificate
+verification, physical-mesh queries and selecting a GitHub publication destination.

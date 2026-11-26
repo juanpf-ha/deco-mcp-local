@@ -16,3 +16,20 @@
   were made. This limitation is explicit in SECURITY.md.
 - Working tree and first Git commit were scanned for known private environment
   identifiers; none found. Secret paths are ignored and excluded from Docker.
+- Independent review found a race in the TLS test peer (unread POST body before
+  closing). Fixed the peer and added a fragmented-request regression.
+- Regression: SDK ValueError was classified as a user argument error. Observed
+  failing test, introduced ArgumentError for client validation, suite green.
+- Target Docker tests initially failed because read-only tests had no writable
+  temp directory. Added a test-only RAM `/tmp` mount to documented/CI commands.
+  Production Compose still needs no writable mount.
+- Final target run: all 26 tests passed on Python 3.14, including the actual SDK
+  encrypted handshake, in an offline non-root read-only container with 128 MB
+  limit. Runtime image built and `--version` returned 0.1.0.
+- Compose smoke with disposable synthetic enrollment passed initialize, tools
+  catalog, write rejection, file-secret mounts and EOF cleanup. Its temporary
+  project was torn down. No physical-router login was attempted.
+- Runtime certificate inspection succeeded and matched a separate OpenSSL
+  observation. This verifies reachability, not independent identity enrollment.
+- Final independent reviewer found no remaining important issues. Known private
+  environment identifiers absent from all Git commits checked.

@@ -51,6 +51,7 @@ before providing credentials. Do not run a downloaded installer as root.
 docker build --target runtime -t deco-mcp-local:0.1.0 .
 docker build --target test -t deco-mcp-local-test:0.1.0 .
 docker run --rm --network none --read-only --cap-drop ALL \
+  --tmpfs /tmp:rw,noexec,nosuid,size=32m,mode=1777 \
   --security-opt no-new-privileges deco-mcp-local-test:0.1.0
 ```
 
@@ -157,6 +158,8 @@ router. We do not alter a shared host's firewall or home automation services.
 `python -m unittest discover -s tests -v` from repository root, with Python 3.14
 and the locked runtime dependencies. Docker tests run offline against generated
 TLS peers and synthetic encrypted SDK responses, never your actual router.
+Only the tests need the small writable `/tmp` RAM mount for throwaway keys and
+fixtures; the production Compose service needs no writable filesystem mount.
 
 Before pushing, review the complete Git history as well as current files.
 Never include `.env`, secret files, real logs, names, addresses, SSH configuration
