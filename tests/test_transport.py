@@ -52,6 +52,24 @@ class TLSPeer:
                 tls.settimeout(3)
                 self.received = tls.recv(65536)
                 if self.received:
+                    # Consume the complete HTTP request before closing TLS.
+                    # A single recv can contain headers without the body;
+                    # closing with unread bytes can cause a TCP reset on Windows.
+                    while b'\r\n\r\n' not in self.received:
+                        chunk = tls.recv(65536)
+                        if not chunk:
+                            return
+                        self.received += chunk
+                    head, body = self.received.split(b'\r\n\r\n', 1)
+                    length = next((int(line.split(b':', 1)[1].strip())
+                                   for line in head.split(b'\r\n')
+                                   if line.lower().startswith(b'content-length:')), 0)
+                    while len(body) < length:
+                        chunk = tls.recv(65536)
+                        if not chunk:
+                            return
+                        body += chunk
+                        self.received += chunk
                     headers = ('HTTP/1.1 ' + self.status + '\r\nContent-Type: application/json\r\n'
                                + 'Location: https://external.invalid/\r\nContent-Length: '
                                + str(len(self.response)) + '\r\nConnection: close\r\n\r\n').encode()
@@ -100,6 +118,20 @@ class TransportTests(unittest.TestCase):
             self.assertEqual(inspect_certificate('10.23.4.1'), peer.pin)
         peer.thread.join(3)
         self.assertEqual(peer.received, b'')
+
+    def test_tls_fixture_consumes_fragmented_request_before_reply(self):
+        peer = self.peer()
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        with socket.create_connection(('127.0.0.1', peer.port), timeout=3) as raw:
+            with ctx.wrap_socket(raw, server_hostname='synthetic-router') as tls:
+                tls.sendall(b'POST /test HTTP/1.1\r\nHost: synthetic-router\r\nContent-Length:')
+                tls.sendall(b' 7\r\n\r\n')
+                tls.sendall(b'{"a":1}')
+                self.assertIn(b'200 OK', tls.recv(4096))
+        peer.thread.join(3)
+        self.assertTrue(peer.received.endswith(b'{"a":1}'))
 
     def test_pinned_request_succeeds_without_environment_proxy(self):
         peer = self.peer()
