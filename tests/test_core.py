@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
+import sys
 import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import patch
@@ -77,6 +79,31 @@ class ConfigTests(unittest.TestCase):
         with patch.dict(os.environ, self.env, clear=True), self.assertRaises(ConfigError):
             Config.from_env()
 
+    def test_cli_protocol_never_prints_credentials_or_logs(self):
+        messages = [dict(jsonrpc='2.0', id=1, method='initialize', params={'protocolVersion': '2025-06-18'}),
+                    dict(jsonrpc='2.0', method='notifications/initialized'),
+                    dict(jsonrpc='2.0', id=2, method='tools/list'),
+                    dict(jsonrpc='2.0', id=3, method='tools/call', params={'name': 'deco_reboot'})]
+        proc = subprocess.run([sys.executable, '-B', '-m', 'deco_mcp_local'],
+            input=''.join(json.dumps(m) + '\n' for m in messages), text=True,
+            capture_output=True, env=os.environ | self.env, timeout=10)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        rows = [json.loads(line) for line in proc.stdout.splitlines()]
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(rows[2]['error']['code'], -32602)
+        self.assertEqual(proc.stderr, '')
+        self.assertNotIn('synthetic-password', proc.stdout)
+
+    def test_config_errors_do_not_echo_secret_paths(self):
+        self.env['DECO_PASSWORD_FILE'] = str(Path(self.tmp.name) / 'private-secret-name')
+        with patch.dict(os.environ, self.env, clear=True):
+            try:
+                Config.from_env()
+            except ConfigError as exc:
+                self.assertNotIn('private-secret-name', str(exc))
+            else:
+                self.fail('Missing file accepted')
+
 
 class PrivacyTests(unittest.TestCase):
     def test_stable_cross_tool_aliases_and_separate_keys(self):
@@ -129,6 +156,14 @@ class QueryTests(unittest.TestCase):
         self.router.get_device_list = devices
         result = self.service.call('deco_status', {})
         self.assertNotIn('ignore previous', json.dumps(result))
+
+    def test_identifiers_visible_mode_is_explicit_and_never_exposes_extra_fields(self):
+        service = QueryService(self.router, Privacy(b'a' * 32, reveal=True))
+        result = service.call('deco_clients', {})
+        self.assertEqual(result['privacy'], 'identifiers_visible')
+        self.assertEqual(result['clients'][0]['name'], 'Private phone')
+        self.assertEqual(result['clients'][0]['address'], '10.23.4.20')
+        self.assertNotIn('never-return-this', json.dumps(result))
 
 
 class ProtocolTests(unittest.TestCase):

@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM python:3.14-slim-trixie AS dependencies
+FROM python:3.14-slim-trixie@sha256:22eafb370920ad8b429e0aec3fff433e0669968519f5d60469d83729c138b28b AS dependencies
 WORKDIR /build
 COPY requirements.lock ./
 RUN pip install --no-cache-dir --disable-pip-version-check --require-hashes \
     --only-binary=:all: --prefix=/install -r requirements.lock
 
-FROM python:3.14-slim-trixie AS runtime
+FROM python:3.14-slim-trixie@sha256:22eafb370920ad8b429e0aec3fff433e0669968519f5d60469d83729c138b28b AS runtime
 COPY --from=dependencies /install /usr/local
 WORKDIR /app
 COPY deco_mcp_local /app/deco_mcp_local

@@ -131,8 +131,8 @@ upload these outputs as GitHub examples. Default mode is recommended.
 - Non-root container, read-only filesystem, no capabilities, CPU/RAM/PID limits,
   no published ports and no Docker socket.
 - Pinned runtime packages with hash checking. Source dependency provenance is in
-  NOTICE.md. Base image tags are mutable: record/pin a tested digest for stricter
-  reproducibility. No automatic updates occur at runtime.
+  NOTICE.md. The Python base image is pinned by digest; review updates before
+  changing the digest. No automatic updates occur at runtime.
 
 Application destination checks are **not** an OS egress firewall against
 arbitrary malicious dependency code. Use a dedicated VM/VLAN/firewall if you

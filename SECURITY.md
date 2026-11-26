@@ -51,8 +51,8 @@ For stronger assurance use a dedicated VM/VLAN and firewall permitting only
 the router's TCP 443 destination for this workload. Do not change a shared host's
 firewall blindly; existing services and Docker rules need individual review.
 
-Dependencies have version/hash locks. The Python image tag is mutable, so record
-the tested image digest for your deployment; verify updates before rebuilding.
+Dependencies have version/hash locks. The Python base image is pinned by digest;
+verify source and security updates before deliberately changing that digest.
 We have not audited all Python, OpenSSL or cryptography source or binary wheels.
 
 Report security problems privately to your deployment maintainer or the GitHub

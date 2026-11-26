@@ -92,6 +92,15 @@ class TransportTests(unittest.TestCase):
         peer.thread.join(3)
         self.assertEqual(peer.received, b'')
 
+    def test_certificate_inspection_sends_no_http(self):
+        peer = self.peer()
+        real_create = socket.create_connection
+        with patch('socket.create_connection', side_effect=lambda address, *a, **kw:
+                   real_create(('127.0.0.1', peer.port), *a, **kw)):
+            self.assertEqual(inspect_certificate('10.23.4.1'), peer.pin)
+        peer.thread.join(3)
+        self.assertEqual(peer.received, b'')
+
     def test_pinned_request_succeeds_without_environment_proxy(self):
         peer = self.peer()
         t = self.transport(peer)
