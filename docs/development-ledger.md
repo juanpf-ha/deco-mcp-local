@@ -33,3 +33,34 @@
   observation. This verifies reachability, not independent identity enrollment.
 - Final independent reviewer found no remaining important issues. Known private
   environment identifiers absent from all Git commits checked.
+- Follow-up physical validation used actual MCP stdio calls for reservation
+  pagination and traffic. Both tools returned valid pseudonymized output; no
+  configuration or data mutations were attempted. Cross-tool comparison remained
+  inconclusive because subsequent client/traffic reads intermittently failed.
+  Safe diagnostics isolated a 45-second client-list timeout after successful
+  login; recent PCIe/Wi-Fi host failures and an SSH timeout were also observed.
+  Documented as a connectivity/reliability investigation, not a passing
+  sustained-operation test. Detailed live observations remain outside Git.
+- Repeated the pending client/traffic correlation after the operator reported
+  stable connectivity. The client tool still failed while SSH was usable and no
+  new Wi-Fi hardware events were observed in the bounded test window. A
+  read-only request-shape probe without the SDK device selector also failed
+  after successful login. No production workaround was applied; API/transport
+  diagnosis remains open rather than attributing all failures to host Wi-Fi.
+- Inspected only public firmware assets over pinned HTTPS: the client-list
+  endpoint and default device selector match the SDK. An alternating four-read
+  experiment changed only Connection: close; baseline failed twice with resets,
+  explicit close succeeded twice. An earlier explicit-close client/traffic pair
+  also shared consistent aliases. Added a real TLS-peer regression (observed
+  failing assertion before implementation) and the minimal header change.
+- The first installed close-header change still failed the stdio client read.
+  Compared the exact reference request: it appends Connection after Cookie,
+  whereas the first patch placed it before Cookie. The exact reference variant
+  passed clients and traffic again. Preserved that header order with a second
+  failing-then-passing TLS-peer regression. Do not claim generic HTTP order
+  requirements or a proven firmware-internal cause.
+- Final Docker Python 3.14 run: all 29 tests passed. The actual installed stdio
+  MCP then completed client and traffic reads, preserving address aliases for
+  every overlapping device and returning no raw names/IP/MAC. Original image
+  retained for rollback. Long-term reliability and traffic measurement units
+  remain unverified; no router configuration was changed.

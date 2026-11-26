@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Mirror urllib's one-shot HTTPS request framing, including a terminal
+  `Connection: close` header after the session cookie, for observed Deco
+  interoperability. Preserve certificate pinning and read guards.
+- Add two generated TLS-peer request-shape regressions and record bounded live
+  client/traffic alias correlation. This is not a long-term reliability claim.
+
 ## v0.1.0-alpha
 
 First experimental community release. The Python package and local Docker image
